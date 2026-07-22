@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Credentials / secrets  (prefer Application Default Credentials)
+*.json
+!sql/*.json
+service-account*.json
+.env
+*.key
+
+# Local state / caches
+.usgs_watermark.json
+*.log
+.DS_Store
+
+# BigQuery scratch
+*.avro
+*.parquet
