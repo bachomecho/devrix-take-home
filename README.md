@@ -107,6 +107,37 @@ hundred events, so storage and scan sit comfortably in the free tier.
 
 ---
 
+## Schema evolution
+
+Schema evolution is a table's structure changing over time while it stays in use
+— columns appearing, types widening, fields dropped or renamed — and the pipeline
+absorbing that without breaking or losing data. It matters because upstream
+sources change on their own schedule: USGS could add a `felt` or `tsunami`
+property to their GeoJSON tomorrow, and this table was created without it.
+
+Changes, roughly safest to riskiest:
+
+- **Add a column** — safest; existing rows read `NULL`. BigQuery supports it
+  directly (`ALLOW_FIELD_ADDITION` on a load job).
+- **Widen a type** (`INT64`→`FLOAT64`, `REQUIRED`→`NULLABLE`) — safe; every
+  existing value is still valid under the new type.
+- **Narrow a type** (`FLOAT64`→`INT64`, `NULLABLE`→`REQUIRED`) — unsafe; existing
+  rows may violate the new constraint, so it usually means rewriting the table.
+- **Drop or rename** — breaks any reader referencing the column; a rename is
+  really a drop plus an add unless column identity is tracked separately.
+
+The useful mental frame is two directions of compatibility: **backward
+compatible** means new code can read old data; **forward compatible** means old
+code can read new data.
+
+**How this pipeline handles it:** it loads with an explicit `RAW_SCHEMA` and
+upserts with `MERGE` on the stable `id`, so additive and widening changes are
+absorbed safely. Capturing a new USGS property (e.g. `felt`) is a one-line change
+— add a `NULLABLE` field to `RAW_SCHEMA`; older partitions simply keep `NULL` for
+it, with no rewrite and no failure. Narrowing and renaming are deliberately *not*
+automated, since those are the unsafe cases that warrant a manual migration.
+
+---
 ## Sample analyst queries
 
 See `sql/04_sample_queries.sql`:
