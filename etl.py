@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 USGS Earthquakes -> BigQuery batch ETL (minimal single-file CLI).
 
