@@ -122,7 +122,7 @@ See `sql/04_sample_queries.sql`:
 - Uses **your own GCP project** and **Application Default Credentials** (no keys
   in the repo).
 - Grant the reviewer **Project Owner** (revoke after review).
-- **Project ID:** `TODO — your-project-id`
+- **Project ID:** `devrix-take-home`
 - **Datasets:** `raw`, `model`
 
 ---
